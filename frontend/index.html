@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Multi-Agent Debate System</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-header">
+        <h1>Multi-Agent Debate System</h1>
+        <p class="subtitle">Deep research & debate playground (MVP)</p>
+      </header>
+
+      <main class="app-main">
+        <section class="card">
+          <h2>1. Topic & debate configuration</h2>
+          <label class="field">
+            <span>Topic (policy / thesis / problem)</span>
+            <textarea
+              id="topic-input"
+              rows="4"
+              placeholder="e.g. Should a major city rapidly roll out fully autonomous taxi fleets?"
+            ></textarea>
+          </label>
+
+          <div class="field-grid">
+            <label class="field">
+              <span>Number of candidate proposals</span>
+              <input id="num-solutions" type="number" min="3" max="5" value="4" />
+            </label>
+            <label class="field">
+              <span>Batches</span>
+              <input id="num-batches" type="number" min="1" max="5" value="2" />
+            </label>
+            <label class="field">
+              <span>Rounds per batch</span>
+              <input id="rounds-per-batch" type="number" min="1" max="5" value="2" />
+            </label>
+          </div>
+
+          <button id="start-btn">Start multi-agent debate</button>
+          <p id="status" class="status"></p>
+        </section>
+
+        <section class="card">
+          <h2>2. Candidate proposals</h2>
+          <div id="proposals" class="proposals"></div>
+        </section>
+
+        <section class="card">
+          <h2>3. Debate transcript</h2>
+          <div id="history" class="history"></div>
+        </section>
+
+        <section class="card">
+          <h2>4. Final report</h2>
+          <pre id="final-report" class="final-report"></pre>
+        </section>
+      </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+  </body>
+  </html>
+
+
