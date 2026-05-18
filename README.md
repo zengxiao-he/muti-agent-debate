@@ -1,105 +1,93 @@
-## Multi-Agent Debate System (MVP)
+# Multi-Agent Debate
 
-A small FastAPI + OpenAI playground for multi-agent deep research and debate.
+FastAPI playground for comparing candidate solutions with several LLM-backed proposal agents and a moderator. The app turns a topic into competing proposals, runs a configurable debate, and returns a final recommendation with the debate history.
 
-Each teammate should run it **locally with their own OpenAI API key**.  
-No API keys should ever be committed to Git or shared in code.
+This is an MVP intended to demonstrate agent orchestration, structured prompts, and a simple web UI. It is not a production research system yet.
 
----
+## What It Does
 
-### 1. Local setup (for every teammate)
+- Generates multiple candidate proposals for a user-supplied topic.
+- Creates one proposal agent per candidate plus a moderator agent.
+- Runs multi-batch, multi-round rebuttals.
+- Produces a final report that compares the proposals and recommends a direction.
+- Serves a small browser UI from the same FastAPI app.
+
+## Architecture
+
+```text
+frontend/
+  index.html, script.js, styles.css
+
+backend/
+  main.py       FastAPI app, health check, static UI, debate endpoint
+  models.py     Pydantic request and response models
+  debate.py     Debate pipeline orchestration
+  agents.py     Proposal and moderator agent behavior
+  research.py   Candidate proposal and evidence generation
+  llm.py        OpenAI client wrapper
+  config.py     Environment-based settings
+```
+
+## Quickstart
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/zengxiao-he/multi-agent-debate.git
 cd multi-agent-debate
 
 python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate
 
 pip install -r requirements.txt
 ```
 
----
-
-### 2. Configure your own OpenAI key
-
-In the same terminal (after activating the venv):
+Set your OpenAI key in the same terminal:
 
 ```bash
-export OPENAI_API_KEY="your_own_openai_key"
-
-# Optional: choose a model; mini models are cheaper and faster
+export OPENAI_API_KEY="your_openai_key"
 export OPENAI_MODEL="gpt-4o-mini"
-# or: export OPENAI_MODEL="gpt-4.1-mini"
 ```
 
-> Important:  
-> - Do **not** hardcode the key in any file.  
-> - Do **not** commit the key to Git or share it with others.  
-> - Every teammate uses their **own** key and pays for their own usage.
-
----
-
-### 3. Run the app
+Run the app:
 
 ```bash
 uvicorn backend.main:app --reload
 ```
 
-By default the server listens on `http://127.0.0.1:8000`.
-
-You can verify the health endpoint:
-
-```bash
-curl http://127.0.0.1:8000/health
-```
-
-If it returns JSON with `"status": "ok"` and `"openai_key_configured": true`,
-you are ready to use the UI.
-
----
-
-### 4. Use the web UI
-
-Open in your browser:
+Open:
 
 ```text
 http://127.0.0.1:8000
 ```
 
-On the page:
-- Enter a topic in **Topic (policy / thesis / problem)**.
-- Adjust:
-  - **Number of candidate proposals** (3–5, default 4)
-  - **Batches** (default 2)
-  - **Rounds per batch** (default 2)
-- Click **Start multi-agent debate**.
+Health check:
 
-The app will:
-1. Do deep research and generate multiple candidate proposals.  
-2. Create one agent per proposal (plus a moderator).  
-3. Run multi-batch, multi-round debate.  
-4. Produce a final report comparing proposals and recommending the best one.
-
-> Tip: For faster and cheaper runs, start with:
-> - 3 proposals  
-> - 1 batch  
-> - 1 round per batch  
-> and a mini model like `gpt-4o-mini`.
-
----
-
-### 5. Suggested `.gitignore`
-
-Make sure your repo ignores local and sensitive files. For example:
-
-```gitignore
-.venv/
-__pycache__/
-.env
+```bash
+curl http://127.0.0.1:8000/health
 ```
 
-This prevents virtualenvs and local secrets from being committed.
+## API
 
+```bash
+curl -X POST http://127.0.0.1:8000/api/debate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "Should a startup build an internal AI support agent?",
+    "language": "en",
+    "config": {
+      "num_solutions": 3,
+      "num_batches": 1,
+      "rounds_per_batch": 1
+    }
+  }'
+```
 
+## Current Limitations
 
+- LLM calls are sequential for readability; parallel proposal generation would reduce latency.
+- The research step depends on model-generated evidence rather than a verified external retrieval pipeline.
+- There is no persisted run history, authentication, or cost tracking yet.
+- The final report is qualitative; a future version should add an evaluation rubric and score proposals explicitly.
+
+## Repository Hygiene
+
+Local environments, Python bytecode, API keys, and OS artifacts are ignored through `.gitignore`. Do not commit `.venv/`, `__pycache__/`, `.env`, or generated caches.
