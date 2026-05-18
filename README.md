@@ -31,8 +31,8 @@ backend/
 ## Quickstart
 
 ```bash
-git clone https://github.com/zengxiao-he/multi-agent-debate.git
-cd multi-agent-debate
+git clone https://github.com/zengxiao-he/muti-agent-debate.git
+cd muti-agent-debate
 
 python3 -m venv .venv
 source .venv/bin/activate
